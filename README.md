@@ -149,18 +149,18 @@ All tool calls run in-process in this binary. The `bash` tool executes the comma
 ## Example: end-to-end with curl
 
 ```bash
-SID=123e4567-e89b-12d3-a456-426614174000
+export SESSION_ID=123e4567-e89b-12d3-a456-426614174000
 
 # 1. Resume the session
-curl -sX POST localhost:8080/v1/environments/bash-env/sessions/$SID/resume
+curl -sX POST localhost:8080/v1/environments/bash-env/sessions/$SESSION_ID/resume
 
 # 2. Run a tool call with env vars
-curl -sX POST localhost:8080/v1/environments/bash-env/sessions/$SID \
+curl -sX POST localhost:8080/v1/environments/bash-env/sessions/$SESSION_ID \
   -H 'Content-Type: application/json' \
   -d '{"env_variables":[{"name":"MY_SECRET","value":"c3ebfdfdk12345..."}],"inputs":[{"call_id":"c1","type":"function","function":{"name":"bash","arguments":"{\"command\":\"uname -a\"}"}}]}'
 
 # 3. Suspend when done
-curl -sX POST localhost:8080/v1/environments/bash-env/sessions/$SID/suspend
+curl -sX POST localhost:8080/v1/environments/bash-env/sessions/$SESSION_ID/suspend
 ```
 
 ---
