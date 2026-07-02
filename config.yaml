@@ -1,0 +1,14 @@
+# Example configuration for the Agent Substrate environment service.
+
+# Address/port for the HTTP environment service to listen on
+listen: ":8080"
+
+ate:
+  # Address of the Agent Substrate ateapi gRPC control server
+  ateapi: "localhost:8080"
+
+  # Address of the Agent Substrate atenet HTTP router
+  atenet: "localhost:8000"
+
+  # Agent Substrate namespace to create/resume actors
+  namespace: "default"

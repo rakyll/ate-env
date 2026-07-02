@@ -20,11 +20,14 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
+
+	"github.com/rakyll/agent-substrate-env/config"
 )
 
-func TestSessionStore_Execute(t *testing.T) {
+func TestSessionManager_Execute(t *testing.T) {
 	// Spin up a test server to mock atenet HTTP router
 	var receivedReq mockProcessRequest
 	var receivedHost string
@@ -55,7 +58,7 @@ func TestSessionStore_Execute(t *testing.T) {
 	// Parse host:port from testServer.URL (skip http://)
 	atenetAddr := testServer.URL[len("http://"):]
 
-	store := NewSessionStore("localhost:8080", atenetAddr, "default")
+	store := NewSessionManager("localhost:8080", atenetAddr, "default")
 	sessionID := "test-session-123"
 
 	// Register session manually in the store
@@ -232,4 +235,42 @@ type mockProcessResponse struct {
 	Stderr   string `json:"stderr"`
 	ExitCode int    `json:"exitCode"`
 	Error    string `json:"error,omitempty"`
+}
+
+func TestLoadYAMLConfig(t *testing.T) {
+	yamlData := `
+listen: ":9090"
+ate:
+  ateapi: "grpc.example.com:443"
+  atenet: "http.example.com"
+  namespace: "my-custom-ns"
+`
+	tmpFile, err := os.CreateTemp("", "config-*.yaml")
+	if err != nil {
+		t.Fatalf("failed to create temp file: %v", err)
+	}
+	defer os.Remove(tmpFile.Name())
+
+	if _, err := tmpFile.Write([]byte(yamlData)); err != nil {
+		t.Fatalf("failed to write config data: %v", err)
+	}
+	tmpFile.Close()
+
+	cfg, err := config.Load(tmpFile.Name())
+	if err != nil {
+		t.Fatalf("failed to load YAML config: %v", err)
+	}
+
+	if cfg.Listen != ":9090" {
+		t.Errorf("expected listen ':9090', got '%s'", cfg.Listen)
+	}
+	if cfg.Ate.Ateapi != "grpc.example.com:443" {
+		t.Errorf("expected ateapi 'grpc.example.com:443', got '%s'", cfg.Ate.Ateapi)
+	}
+	if cfg.Ate.Atenet != "http.example.com" {
+		t.Errorf("expected atenet 'http.example.com', got '%s'", cfg.Ate.Atenet)
+	}
+	if cfg.Ate.Namespace != "my-custom-ns" {
+		t.Errorf("expected namespace 'my-custom-ns', got '%s'", cfg.Ate.Namespace)
+	}
 }

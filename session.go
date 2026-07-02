@@ -41,8 +41,8 @@ type Session struct {
 	Tools        []string
 }
 
-// SessionStore manages active sandboxed sessions and handles communication with Agent Substrate.
-type SessionStore struct {
+// SessionManager manages active sandboxed sessions and handles communication with Agent Substrate.
+type SessionManager struct {
 	mu           sync.RWMutex
 	sessions     map[string]*Session
 	ateapiAddr   string
@@ -50,9 +50,9 @@ type SessionStore struct {
 	ateNamespace string
 }
 
-// NewSessionStore creates a new SessionStore.
-func NewSessionStore(ateapiAddr, atenetAddr, ateNamespace string) *SessionStore {
-	return &SessionStore{
+// NewSessionManager creates a new SessionManager.
+func NewSessionManager(ateapiAddr, atenetAddr, ateNamespace string) *SessionManager {
+	return &SessionManager{
 		sessions:     make(map[string]*Session),
 		ateapiAddr:   ateapiAddr,
 		atenetAddr:   atenetAddr,
@@ -61,7 +61,7 @@ func NewSessionStore(ateapiAddr, atenetAddr, ateNamespace string) *SessionStore 
 }
 
 // dialAteAPI creates a new gRPC client connection to the Agent Substrate Control API.
-func (s *SessionStore) dialAteAPI() (ateapipb.ControlClient, *grpc.ClientConn, error) {
+func (s *SessionManager) dialAteAPI() (ateapipb.ControlClient, *grpc.ClientConn, error) {
 	creds := credentials.NewTLS(&tls.Config{InsecureSkipVerify: true})
 	conn, err := grpc.NewClient(s.ateapiAddr, grpc.WithTransportCredentials(creds))
 	if err != nil {
@@ -71,7 +71,7 @@ func (s *SessionStore) dialAteAPI() (ateapipb.ControlClient, *grpc.ClientConn, e
 }
 
 // Resume creates (if not exists) and resumes the underlying sandboxed actor for the session.
-func (s *SessionStore) Resume(ctx context.Context, req ResumeRequest) error {
+func (s *SessionManager) Resume(ctx context.Context, req ResumeRequest) error {
 	if req.SessionID == "" {
 		return fmt.Errorf("session_id cannot be empty")
 	}
@@ -126,7 +126,7 @@ func (s *SessionStore) Resume(ctx context.Context, req ResumeRequest) error {
 }
 
 // Suspend suspends the underlying sandboxed actor and removes the session from the cache.
-func (s *SessionStore) Suspend(ctx context.Context, sessionID string) error {
+func (s *SessionManager) Suspend(ctx context.Context, sessionID string) error {
 	if sessionID == "" {
 		return fmt.Errorf("session_id cannot be empty")
 	}
@@ -154,7 +154,7 @@ func (s *SessionStore) Suspend(ctx context.Context, sessionID string) error {
 }
 
 // Execute parses and runs multiple tool calls inside the sandboxed actor.
-func (s *SessionStore) Execute(ctx context.Context, sessionID string, toolCalls []ToolCall) ([]ToolResponse, error) {
+func (s *SessionManager) Execute(ctx context.Context, sessionID string, toolCalls []ToolCall) ([]ToolResponse, error) {
 	s.mu.RLock()
 	_, exists := s.sessions[sessionID]
 	s.mu.RUnlock()
@@ -179,7 +179,7 @@ func (s *SessionStore) Execute(ctx context.Context, sessionID string, toolCalls 
 }
 
 // executeToolCall routes a single tool call to the actor's /process endpoint.
-func (s *SessionStore) executeToolCall(ctx context.Context, sessionID string, tc ToolCall) ToolResponse {
+func (s *SessionManager) executeToolCall(ctx context.Context, sessionID string, tc ToolCall) ToolResponse {
 	// OpenResponses uses call_id; OpenAI uses id. Let's support both.
 	callID := tc.CallID
 	if callID == "" {
@@ -270,7 +270,7 @@ func (s *SessionStore) executeToolCall(ctx context.Context, sessionID string, tc
 }
 
 // executeInActor sends a process execution request to the actor's /process HTTP endpoint via the atenet router.
-func (s *SessionStore) executeInActor(ctx context.Context, sessionID string, cmd []string, customEnv map[string]string) (string, error) {
+func (s *SessionManager) executeInActor(ctx context.Context, sessionID string, cmd []string, customEnv map[string]string) (string, error) {
 	url := fmt.Sprintf("http://%s/process", s.atenetAddr)
 
 	// Merge session environment variables and custom tool environment variables
