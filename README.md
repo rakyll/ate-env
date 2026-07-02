@@ -86,6 +86,18 @@ Create (if needed) and resume the actor for a session.
 
 **Response:** `{ "status": "ok" }`
 
+
+### `POST /environment/suspend`
+
+Suspend the actor and evict the session.
+
+```json
+{ "session_id": "123e4567-e89b-12d3-a456-426614174000" }
+```
+
+**Response:** `{ "status": "ok" }`
+
+
 ### `POST /environment`
 
 Execute one or more tool calls in the session's actor. The session must have been resumed first.
@@ -119,16 +131,6 @@ Execute one or more tool calls in the session's actor. The session must have bee
   ]
 }
 ```
-
-### `POST /environment/suspend`
-
-Suspend the actor and evict the session.
-
-```json
-{ "session_id": "123e4567-e89b-12d3-a456-426614174000" }
-```
-
-**Response:** `{ "status": "ok" }`
 
 ---
 
