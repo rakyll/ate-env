@@ -58,7 +58,7 @@ func newSessionManager(path string) (*config.Config, *session.SessionManager, er
 			Tools:        env.EnabledTools,
 		}
 	}
-	store := session.NewSessionManager(cfg.Ate.Ateapi, cfg.Ate.Namespace, envs)
+	store := session.NewSessionManager(cfg.Ate.Ateapi, cfg.Ate.Atespace, envs)
 	return cfg, store, nil
 }
 

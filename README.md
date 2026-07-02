@@ -41,7 +41,7 @@ listen: ":8080"
 # Agent Substrate configuration.
 ate:
   ateapi: "ateapi.ate-system.svc.cluster.local:443"
-  namespace: "default"
+  atespace: "default"
 
 # Predefined environments mapping client-facing names to Agent Substrate templates.
 environments:
@@ -58,7 +58,7 @@ environments:
 | --------------- | ------------------ | ------------------------------------------------------- |
 | `listen`        | `:8080`            | Bind address.|
 | `ate.ateapi`    | `ateapi.ate-system.svc.cluster.local:443` | Agent Substrate Control API endpoint.|
-| `ate.namespace` | `default`          | Actor template namespace.                               |
+| `ate.atespace`  | `default`          | Actor template atespace.                                |
 | `environments`  | `bash-env` -> `bash-env-template` | List of predefined client-facing environment to Agent Substrate template mappings. |
 
 ---

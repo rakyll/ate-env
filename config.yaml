@@ -17,5 +17,5 @@ ate:
   # Address of the Agent Substrate ateapi gRPC server
   ateapi: "ateapi.ate-system.svc.cluster.local:443"
 
-  # Agent Substrate namespace to create/resume actors
-  namespace: "default"
+  # Agent Substrate atespace to create/resume actors
+  atespace: "default"

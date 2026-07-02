@@ -173,7 +173,7 @@ func TestLoadYAMLConfig(t *testing.T) {
 listen: ":9090"
 ate:
   ateapi: "grpc.example.com:443"
-  namespace: "my-custom-ns"
+  atespace: "my-custom-ns"
 environments:
   - name: "bash-env"
     template: "bash-env-template"
@@ -202,8 +202,8 @@ environments:
 	if cfg.Ate.Ateapi != "grpc.example.com:443" {
 		t.Errorf("expected ateapi 'grpc.example.com:443', got '%s'", cfg.Ate.Ateapi)
 	}
-	if cfg.Ate.Namespace != "my-custom-ns" {
-		t.Errorf("expected namespace 'my-custom-ns', got '%s'", cfg.Ate.Namespace)
+	if cfg.Ate.Atespace != "my-custom-ns" {
+		t.Errorf("expected atespace 'my-custom-ns', got '%s'", cfg.Ate.Atespace)
 	}
 	if len(cfg.Environments) != 1 {
 		t.Fatalf("expected 1 environment, got %d", len(cfg.Environments))

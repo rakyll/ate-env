@@ -35,15 +35,15 @@ import (
 // SessionManager handles communication with Agent Substrate.
 type SessionManager struct {
 	ateapiAddr   string
-	ateNamespace string
+	atespace     string
 	environments map[string]EnvDetails
 }
 
 // NewSessionManager creates a new SessionManager.
-func NewSessionManager(ateapiAddr, ateNamespace string, environments map[string]EnvDetails) *SessionManager {
+func NewSessionManager(ateapiAddr, atespace string, environments map[string]EnvDetails) *SessionManager {
 	return &SessionManager{
 		ateapiAddr:   ateapiAddr,
-		ateNamespace: ateNamespace,
+		atespace:     atespace,
 		environments: environments,
 	}
 }
@@ -78,15 +78,15 @@ func (s *SessionManager) Resume(ctx context.Context, sessionID, envName string) 
 	if mapped, exists := s.environments[envName]; exists {
 		templateName = mapped.TemplateName
 		tools = mapped.Tools
-		log.Printf("Creating actor %s with template %s (mapped from %s) in namespace %s with tools %v...", sessionID, templateName, envName, s.ateNamespace, tools)
+		log.Printf("Creating actor %s with template %s (mapped from %s) in atespace %s with tools %v...", sessionID, templateName, envName, s.atespace, tools)
 	} else {
-		log.Printf("Creating actor %s with template %s in namespace %s...", sessionID, templateName, s.ateNamespace)
+		log.Printf("Creating actor %s with template %s in atespace %s...", sessionID, templateName, s.atespace)
 	}
 
 	// 1. Create Actor (idempotent, ignore AlreadyExists)
 	_, err = cli.CreateActor(ctx, &ateapipb.CreateActorRequest{
 		ActorId:                sessionID,
-		ActorTemplateNamespace: s.ateNamespace,
+		ActorTemplateNamespace: s.atespace,
 		ActorTemplateName:      templateName,
 	})
 	if err != nil && status.Code(err) != codes.AlreadyExists {

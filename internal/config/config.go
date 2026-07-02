@@ -22,8 +22,8 @@ import (
 
 // AteConfig represents the nested Agent Substrate configuration.
 type AteConfig struct {
-	Ateapi    string `yaml:"ateapi"`
-	Namespace string `yaml:"namespace"`
+	Ateapi   string `yaml:"ateapi"`
+	Atespace string `yaml:"atespace"`
 }
 
 // EnvironmentConfig represents a predefined environment mapping.
@@ -45,8 +45,8 @@ func Default() *Config {
 	return &Config{
 		Listen: ":8080",
 		Ate: AteConfig{
-			Ateapi:    "ateapi.ate-system.svc.cluster.local:443",
-			Namespace: "default",
+			Ateapi:   "ateapi.ate-system.svc.cluster.local:443",
+			Atespace: "default",
 		},
 		Environments: []EnvironmentConfig{
 			{
@@ -81,8 +81,8 @@ func Load(path string) (*Config, error) {
 	if parsed.Ate.Ateapi != "" {
 		cfg.Ate.Ateapi = parsed.Ate.Ateapi
 	}
-	if parsed.Ate.Namespace != "" {
-		cfg.Ate.Namespace = parsed.Ate.Namespace
+	if parsed.Ate.Atespace != "" {
+		cfg.Ate.Atespace = parsed.Ate.Atespace
 	}
 	if len(parsed.Environments) > 0 {
 		cfg.Environments = parsed.Environments
