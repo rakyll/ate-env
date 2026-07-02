@@ -132,12 +132,19 @@ func (s *SessionManager) Suspend(ctx context.Context, sessionID string) error {
 }
 
 // Execute parses and runs multiple tool calls inside the sandboxed actor.
-func (s *SessionManager) Execute(ctx context.Context, sessionID string, envVariables []EnvVariable, toolCalls []ToolCall) ([]ToolResponse, error) {
+func (s *SessionManager) Execute(ctx context.Context, sessionID string, envName string, envVariables []EnvVariable, toolCalls []ToolCall) ([]ToolResponse, error) {
 	if sessionID == "" {
 		return nil, fmt.Errorf("session_id cannot be empty")
 	}
 	if len(toolCalls) == 0 {
 		return nil, fmt.Errorf("no valid tool calls found in inputs")
+	}
+
+	var allowedTools []string
+	if mapped, exists := s.environments[envName]; exists {
+		allowedTools = mapped.Tools
+	} else {
+		return nil, fmt.Errorf("unknown environment %q", envName)
 	}
 
 	// Convert EnvVariables slice to map for easier lookups
@@ -148,11 +155,34 @@ func (s *SessionManager) Execute(ctx context.Context, sessionID string, envVaria
 
 	var responses []ToolResponse
 	for _, tc := range toolCalls {
+		// Verify if tool is enabled in this environment
+		if !isToolAllowed(tc.Function.Name, allowedTools) {
+			callID := tc.CallID
+			if callID == "" {
+				callID = tc.ID
+			}
+			responses = append(responses, ToolResponse{
+				Name:    tc.Function.Name,
+				CallID:  callID,
+				Content: fmt.Sprintf("Error: tool '%s' is not enabled in environment '%s'", tc.Function.Name, envName),
+			})
+			continue
+		}
+
 		resp := s.executeToolCall(ctx, sessionID, envVars, tc)
 		responses = append(responses, resp)
 	}
 
 	return responses, nil
+}
+
+func isToolAllowed(tool string, allowed []string) bool {
+	for _, t := range allowed {
+		if t == tool {
+			return true
+		}
+	}
+	return false
 }
 
 // executeToolCall routes a single tool call to the actor's /process endpoint.

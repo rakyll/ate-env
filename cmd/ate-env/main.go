@@ -47,7 +47,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /environment/resume", handleResume(store))
 	mux.HandleFunc("POST /environment/suspend", handleSuspend(store))
-	mux.HandleFunc("POST /environment", handleExecute(store))
+	mux.HandleFunc("POST /environment/{env_name}", handleExecute(store))
 	mux.HandleFunc("GET /healthz", handleHealthz)
 
 	// Ensure port has a colon if it's just a raw port number
@@ -111,7 +111,8 @@ func handleExecute(store *session.SessionManager) http.HandlerFunc {
 			return
 		}
 
-		responses, err := store.Execute(r.Context(), req.SessionID, req.EnvVariables, req.Inputs)
+		envName := r.PathValue("env_name")
+		responses, err := store.Execute(r.Context(), req.SessionID, envName, req.EnvVariables, req.Inputs)
 		if err != nil {
 			log.Printf("failed to execute tool calls for session %s: %v", req.SessionID, err)
 			http.Error(w, fmt.Sprintf("failed to execute tool calls: %v", err), http.StatusInternalServerError)

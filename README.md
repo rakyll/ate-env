@@ -101,9 +101,9 @@ Suspend the actor and evict the session.
 **Response:** `{ "status": "ok" }`
 
 
-### `POST /environment`
+### `POST /environment/{env_name}`
 
-Execute one or more tool calls in the session's actor. The session must have been resumed first.
+Execute one or more tool calls in the session's actor. The session must have been resumed first. Only tools configured/enabled for the `{env_name}` can be executed.
 
 ```json
 {
@@ -166,7 +166,7 @@ curl -sX POST localhost:8080/environment/resume \
   -d '{"name":"bash-env","session_id":"123e4567-e89b-12d3-a456-426614174000"}'
 
 # 2. Run a tool call with env vars
-curl -sX POST localhost:8080/environment \
+curl -sX POST localhost:8080/environment/bash-env \
   -H 'Content-Type: application/json' \
   -d '{"session_id":"123e4567-e89b-12d3-a456-426614174000","env_variables":[{"name":"MY_SECRET","value":"c3ebfdfdk12345..."}],"inputs":[{"call_id":"c1","type":"function","function":{"name":"bash","arguments":"{\"command\":\"uname -a\"}"}}]}'
 

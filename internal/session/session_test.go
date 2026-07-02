@@ -58,7 +58,12 @@ func TestSessionManager_Execute(t *testing.T) {
 	// Parse host:port from testServer.URL (skip http://)
 	atenetAddr := testServer.URL[len("http://"):]
 
-	store := NewSessionManager("localhost:8080", "default", nil)
+	store := NewSessionManager("localhost:8080", "default", map[string]EnvDetails{
+		"bash-env": {
+			TemplateName: "bash-env-template",
+			Tools:        []string{"bash", "read_file", "write_file"},
+		},
+	})
 	store.atenetAddr = atenetAddr
 	sessionID := "test-session-123"
 
@@ -79,7 +84,7 @@ func TestSessionManager_Execute(t *testing.T) {
 			},
 		}
 
-		resps, err := store.Execute(context.Background(), sessionID, envVars, inputs)
+		resps, err := store.Execute(context.Background(), sessionID, "bash-env", envVars, inputs)
 		if err != nil {
 			t.Fatalf("Execute failed: %v", err)
 		}
@@ -122,7 +127,7 @@ func TestSessionManager_Execute(t *testing.T) {
 			},
 		}
 
-		_, err := store.Execute(context.Background(), sessionID, nil, inputs)
+		_, err := store.Execute(context.Background(), sessionID, "bash-env", nil, inputs)
 		if err != nil {
 			t.Fatalf("Execute failed: %v", err)
 		}
@@ -159,7 +164,7 @@ func TestSessionManager_Execute(t *testing.T) {
 			},
 		}
 
-		resps, err := store.Execute(context.Background(), sessionID, nil, inputs)
+		resps, err := store.Execute(context.Background(), sessionID, "bash-env", nil, inputs)
 		if err != nil {
 			t.Fatalf("Execute failed: %v", err)
 		}
@@ -201,7 +206,7 @@ func TestSessionManager_Execute(t *testing.T) {
 			},
 		}
 
-		resps, err := store.Execute(context.Background(), sessionID, nil, inputs)
+		resps, err := store.Execute(context.Background(), sessionID, "bash-env", nil, inputs)
 		if err != nil {
 			t.Fatalf("Execute failed: %v", err)
 		}
@@ -214,7 +219,7 @@ func TestSessionManager_Execute(t *testing.T) {
 			t.Errorf("Expected call_id 'call-4', got %s", resps[0].CallID)
 		}
 
-		expectedErr := "Error: unsupported tool 'custom_unsupported_tool'"
+		expectedErr := "Error: tool 'custom_unsupported_tool' is not enabled in environment 'bash-env'"
 		if resps[0].Content != expectedErr {
 			t.Errorf("Expected response content '%s', got '%s'", expectedErr, resps[0].Content)
 		}
