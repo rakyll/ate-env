@@ -28,9 +28,9 @@ tool call responses.
                                                    └───────────┘
 ```
 
-1. **`/environment/resume`** — creates the actor (idempotent) via the `ateapi` gRPC Agent Substrate, resumes it, and caches the session's env vars + enabled tools in memory.
+1. **`/environment/resume`** — creates an actor (idempotent) via Agent Substrate, resumes it, and caches the session's env vars + enabled tools in memory.
 1. **`/environment/suspend`** — suspends the actor and drops the session from the in-memory cache.
-1. **`/environment`** — parses each tool call, maps it to a shell command, and forwards it to the actor's `/process` endpoint through the `atenet` HTTP router. Session env vars are merged into every command.
+1. **`/environment`** — sends tool calls to the actor and executes them to return tool responses.
 
 ---
 
