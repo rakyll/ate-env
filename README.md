@@ -130,10 +130,6 @@ Suspend the actor and evict the session.
 
 **Response:** `{ "status": "ok" }`
 
-### `GET /healthz`
-
-Liveness check → `{ "status": "healthy" }`
-
 ---
 
 ## Supported tools
