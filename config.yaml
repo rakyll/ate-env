@@ -3,15 +3,14 @@
 # Address/port for the HTTP environment service to listen on
 listen: ":8080"
 
+# Predefined environments mapping client-facing names to Agent Substrate templates.
+environments:
+  - name: "bash-env"
+    template: "bash-env-template"
+
 ate:
   # Address of the Agent Substrate ateapi gRPC server
   ateapi: "ateapi.ate-system.svc.cluster.local:443"
 
   # Agent Substrate namespace to create/resume actors
   namespace: "default"
-
-# Predefined environments mapping client-facing names to Agent Substrate templates.
-environments:
-  - name: "bash-env"
-    template: "bash-env-template"
-
