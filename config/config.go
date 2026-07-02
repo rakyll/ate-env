@@ -38,7 +38,7 @@ func Default() *Config {
 	return &Config{
 		Listen: ":8080",
 		Ate: AteConfig{
-			Ateapi:    "localhost:8080",
+			Ateapi:    "ateapi.ate-system.svc.cluster.local:443",
 			Atenet:    "localhost:8000",
 			Namespace: "default",
 		},

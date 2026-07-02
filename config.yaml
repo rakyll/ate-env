@@ -5,7 +5,7 @@ listen: ":8080"
 
 ate:
   # Address of the Agent Substrate ateapi gRPC server
-  ateapi: "localhost:8080"
+  ateapi: "ateapi.ate-system.svc.cluster.local:443"
 
   # Address of the Agent Substrate atenet HTTP router
   atenet: "localhost:8000"

@@ -44,7 +44,7 @@ listen: ":8080"
 
 ate:
   # Agent Substrate ateapi gRPC server
-  ateapi: "localhost:8080"
+  ateapi: "ateapi.ate-system.svc.cluster.local:443"
 
   # Agent Substrate atenet HTTP router
   atenet: "localhost:8000"
@@ -56,7 +56,7 @@ ate:
 | Field           | Default            | Description                                             |
 | --------------- | ------------------ | ------------------------------------------------------- |
 | `listen`        | `:8080`            | Bind address. A bare port (e.g. `8080`) is auto-prefixed with `:`. |
-| `ate.ateapi`    | `localhost:8080`   | Agent Substrate gRPC address (create/resume/suspend actors). |
+| `ate.ateapi`    | `ateapi.ate-system.svc.cluster.local:443` | Agent Substrate gRPC address (create/resume/suspend actors). |
 | `ate.atenet`    | `localhost:8000`   | HTTP router address that fronts the actors.             |
 | `ate.namespace` | `default`          | Actor template namespace.                               |
 
