@@ -21,7 +21,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/rakyll/agent-substrate-env/config"
+	"github.com/rakyll/agent-substrate-env/internal/config"
+	"github.com/rakyll/agent-substrate-env/internal/session"
 )
 
 func main() {
@@ -38,7 +39,7 @@ func main() {
 	for _, env := range cfg.Environments {
 		envs[env.Name] = env.Template
 	}
-	store := NewSessionManager(cfg.Ate.Ateapi, cfg.Ate.Namespace, envs)
+	store := session.NewSessionManager(cfg.Ate.Ateapi, cfg.Ate.Namespace, envs)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /environment/resume", handleResume(store))
@@ -59,9 +60,9 @@ func main() {
 }
 
 // handleResume handles environment resume requests.
-func handleResume(store *SessionManager) http.HandlerFunc {
+func handleResume(store *session.SessionManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req ResumeRequest
+		var req session.ResumeRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, fmt.Sprintf("invalid request payload: %v", err), http.StatusBadRequest)
 			return
@@ -79,9 +80,9 @@ func handleResume(store *SessionManager) http.HandlerFunc {
 }
 
 // handleSuspend handles environment suspend requests.
-func handleSuspend(store *SessionManager) http.HandlerFunc {
+func handleSuspend(store *session.SessionManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req SuspendRequest
+		var req session.SuspendRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, fmt.Sprintf("invalid request payload: %v", err), http.StatusBadRequest)
 			return
@@ -99,9 +100,9 @@ func handleSuspend(store *SessionManager) http.HandlerFunc {
 }
 
 // handleExecute handles environment tool execution requests.
-func handleExecute(store *SessionManager) http.HandlerFunc {
+func handleExecute(store *session.SessionManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req ExecuteRequest
+		var req session.ExecuteRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, fmt.Sprintf("invalid request payload: %v", err), http.StatusBadRequest)
 			return
@@ -115,7 +116,7 @@ func handleExecute(store *SessionManager) http.HandlerFunc {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(ExecuteResponse{Outputs: responses})
+		json.NewEncoder(w).Encode(session.ExecuteResponse{Outputs: responses})
 	}
 }
 
