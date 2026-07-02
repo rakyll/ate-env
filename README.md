@@ -4,9 +4,10 @@ A lightweight **environment service** for [Agent Substrate](https://github.com/a
 run tools — file operations and shell commands — inside session-tenant sandboxed actors.
 
 Each session maps to a sandboxed **actor** in Agent Substrate.
-This service manages that actor's lifecycle (create → resume → suspend) and
-translates incoming tool calls into operations executed inside the actor. It returns
-tool call responses.
+This service runs inside the actor: it manages the actor's lifecycle (create →
+resume → suspend) via the Agent Substrate control API, and executes incoming
+tool calls in-process against the local environment. It returns tool call
+responses.
 
 ---
 
@@ -26,7 +27,7 @@ flowchart LR
 
 1. **`resume`** — creates an actor (idempotent) via Agent Substrate and resumes it.
 1. **`suspend`** — suspends the actor.
-1. **`execute`** — sends tool calls to the actor and executes them to return tool responses.
+1. **`execute`** — runs tool calls in-process (local file ops and shell commands) and returns tool responses.
 
 The service is stateless: every request identifies both the environment and the
 session in the URL path, so no per-session state is kept in memory.
@@ -132,11 +133,11 @@ Execute one or more tool calls in the session's actor. The session must have bee
 
 ## Supported tools
 
-The `bash` tool is translated into a shell command executed inside the actor via its process runner. File operation tools (`read_file`, `write_file`, `list_dir`) run in-process on the local filesystem using the Go standard library — they never shell out.
+All tool calls run in-process in this binary. The `bash` tool executes the command locally with `sh -c` via `os/exec`. File operation tools (`read_file`, `write_file`, `list_dir`) use the Go standard library directly — they never shell out.
 
 | Tool          | Arguments                    | Behavior                                            |
 | ------------- | ---------------------------- | --------------------------------------------------- |
-| `bash`        | `command` (or `code`/`cmd`)  | Runs the command with `sh -c` inside the actor.     |
+| `bash`        | `command` (or `code`/`cmd`)  | Runs the command locally with `sh -c` (`os/exec`); per-call env vars are merged in. |
 | `read_file`   | `path`                       | Reads and returns the file contents (`os.ReadFile`). |
 | `write_file`  | `path`, `content`            | Creates parent dirs (`os.MkdirAll`) and writes the content (`os.WriteFile`). |
 | `list_dir`    | `path` (defaults to `.`)     | Lists the directory (`os.ReadDir`), `ls -la` style. |
