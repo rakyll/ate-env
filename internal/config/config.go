@@ -43,7 +43,7 @@ type Config struct {
 // Default returns a Config initialized with default values.
 func Default() *Config {
 	return &Config{
-		Listen: ":8080",
+		Listen: ":7777",
 		Ate: AteConfig{
 			Ateapi:   "ateapi.ate-system.svc.cluster.local:443",
 			Atespace: "default",

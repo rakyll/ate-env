@@ -1,7 +1,7 @@
 # Example configuration for the Agent Substrate environment service.
 
 # Address/port for the HTTP environment service to listen on
-listen: ":8080"
+listen: ":7777"
 
 # Predefined environments mapping client-facing names to Agent Substrate templates.
 environments:

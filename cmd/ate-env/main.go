@@ -66,7 +66,7 @@ func newSessionManager(path string) (*config.Config, *session.SessionManager, er
 // only a bare port number is given.
 func listenAddr(listen string) string {
 	if listen == "" {
-		return ":8080"
+		return ":7777"
 	}
 	if !strings.Contains(listen, ":") {
 		return ":" + listen

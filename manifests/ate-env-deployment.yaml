@@ -33,7 +33,7 @@ metadata:
   namespace: ate-env
 data:
   config.yaml: |
-    listen: ":8080"
+    listen: ":7777"
     environments:
       - name: "bash-env"
         template: "bash-env-template"
@@ -73,17 +73,17 @@ spec:
           image: ${ATE_ENV_IMAGE}
           command: ["/ate-env", "serve", "--config", "/etc/ate-env/config.yaml"]
           ports:
-            - containerPort: 8080
+            - containerPort: 7777
           readinessProbe:
             httpGet:
               path: /healthz
-              port: 8080
+              port: 7777
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /healthz
-              port: 8080
+              port: 7777
             initialDelaySeconds: 10
             periodSeconds: 20
           volumeMounts:
@@ -106,5 +106,5 @@ spec:
   selector:
     app: ate-env
   ports:
-    - port: 8080
-      targetPort: 8080
+    - port: 7777
+      targetPort: 7777
