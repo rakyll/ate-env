@@ -12,20 +12,16 @@ tool call responses.
 
 ## Overview
 
-```
-                  ┌──────────────────────────────┐
- Agent runtime    │      agent-substrate-env     │
- ──────────────►  │                              │
-                  │  Session operations          │                  ┌───────────┐
-   /resume  ───►  │   ├─ Resume               ───┼────────────────► │   Agent   │
-   /suspend ───►  │   ├─ Suspend              ───┼────────────────► │ Substrate │
-   /environment►  │   └─ Execute tool calls   ───┼───────┐          └───────────┘
-                  └──────────────────────────────┘       │
-                                                         ▼
-                                                   ┌───────────┐
-                                                   │   Actor   │
-                                                   │ (sandbox) │  → runs operations
-                                                   └───────────┘
+```mermaid
+flowchart LR
+    runtime["Agent Runtime"]
+    env["Agent Substrate Environment"]
+    substrate["Agent Substrate Control API"]
+    actor["Actor (sandbox)"]
+
+    runtime -->|resume, suspend, execute| env
+    env -->|actor lifecycle operations| substrate
+    env -->|tool call operations| actor
 ```
 
 1. **`/environment/resume`** — creates an actor (idempotent) via Agent Substrate, resumes it, and caches the session's env vars + enabled tools in memory.
