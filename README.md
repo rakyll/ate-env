@@ -66,7 +66,7 @@ environments:
 ## Usage
 
 ```bash
-# Control plane: actor lifecycle (resume, suspend).
+# TODO: Update with Substrate deployment instructions.
 ate-env serve --config config.yaml
 ```
 ---
