@@ -104,7 +104,7 @@ Execute one or more tool calls in the session's actor. The session must have bee
   "inputs": [
     {
       "call_id": "call_1",
-      "type": "function",
+      "type": "function_call",
       "function": {
         "name": "bash",
         "arguments": "{\"command\": \"echo hi && ls\"}"
@@ -157,7 +157,7 @@ curl -sX POST localhost:8080/v1/environments/bash-env/sessions/$SESSION_ID/resum
 # 2. Run a tool call with env vars
 curl -sX POST localhost:8080/v1/environments/bash-env/sessions/$SESSION_ID \
   -H 'Content-Type: application/json' \
-  -d '{"env_variables":[{"name":"MY_SECRET","value":"c3ebfdfdk12345..."}],"inputs":[{"call_id":"c1","type":"function","function":{"name":"bash","arguments":"{\"command\":\"uname -a\"}"}}]}'
+  -d '{"env_variables":[{"name":"MY_SECRET","value":"c3ebfdfdk12345..."}],"inputs":[{"call_id":"c1","type":"function_call","function":{"name":"bash","arguments":"{\"command\":\"uname -a\"}"}}]}'
 
 # 3. Suspend when done
 curl -sX POST localhost:8080/v1/environments/bash-env/sessions/$SESSION_ID/suspend
