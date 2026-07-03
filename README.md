@@ -28,8 +28,6 @@ flowchart LR
     actor --> web_fetcher
 ```
 
----
-
 ## Configuration
 
 Configuration is loaded from `config.yaml` in the working directory. If the file is missing, built-in defaults are used. Any field left empty falls back to its default.
