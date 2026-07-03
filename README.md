@@ -165,4 +165,4 @@ curl -sX POST localhost:7777/v1/environments/bash-env/sessions/$SESSION_ID/suspe
 
 ## License
 
-Apache 2.0 — see the license headers in source files.
+Apache 2.0.
