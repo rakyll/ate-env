@@ -12,8 +12,8 @@ against the local environment. It returns tool call responses.
 
 ## Overview
 
-<div style="padding: 30px 0;">
 ```mermaid
+%%{init: {"flowchart": {"diagramPadding": 80}}}%%
 flowchart LR
     runtime["Agent Runtime"]
     env["Agent Substrate Environment"]
@@ -27,7 +27,6 @@ flowchart LR
     actor --> bash
     actor --> web_fetcher
 ```
-</div>
 
 ---
 
