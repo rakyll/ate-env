@@ -23,6 +23,7 @@ flowchart LR
     env -->|tool call operations| actor
     actor --> filesystem
     actor --> bash
+    actor --> skill
     actor --> web_fetcher
 ```
 
@@ -35,7 +36,7 @@ Configuration is loaded from `config.yaml` in the working directory. If the file
 listen: ":7777"
 
 # Directory holding agentic skills, exposed via list_skills/activate_skill.
-skills_dir: "skills"
+skills_dir: "/skills"
 
 # Agent Substrate configuration.
 ate:
@@ -58,7 +59,7 @@ environments:
 | Field           | Default            | Description                                             |
 | --------------- | ------------------ | ------------------------------------------------------- |
 | `listen`        | `:7777`            | Bind address.|
-| `skills_dir`    | `skills`           | Directory holding agentic skills (see below).           |
+| `skills_dir`    | `/skills`          | Directory holding agentic skills (see below).           |
 | `environments`  | `bash-env` -> `bash-env-template` | List of predefined client-facing environment to Agent Substrate template mappings. |
 | `ate.ateapi`    | `ateapi.ate-system.svc.cluster.local:443` | Agent Substrate Control API endpoint.|
 | `ate.atespace`  | `default`          | Actor template atespace.                                |
@@ -133,7 +134,7 @@ All tool calls run in-process in this binary. The `bash` tool executes the comma
 The service supports [Agent Skills](https://agentskills.io) out of the box. A skill is a subdirectory of `skills_dir` containing a `SKILL.md` file — YAML frontmatter (`name`, `description`) followed by markdown instructions — plus any bundled files the instructions reference:
 
 ```
-skills/
+/skills/
 └── pdf-processing/
     ├── SKILL.md
     └── extract.sh

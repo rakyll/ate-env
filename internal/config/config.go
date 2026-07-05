@@ -45,7 +45,7 @@ type Config struct {
 func Default() *Config {
 	return &Config{
 		Listen:    ":7777",
-		SkillsDir: "skills",
+		SkillsDir: "/skills",
 		Ate: AteConfig{
 			Ateapi:   "ateapi.ate-system.svc.cluster.local:443",
 			Atespace: "default",

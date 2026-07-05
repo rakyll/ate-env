@@ -6,7 +6,7 @@ listen: ":7777"
 # Directory holding agentic skills. Each skill is a subdirectory containing a
 # SKILL.md file (YAML frontmatter + markdown instructions) plus any bundled
 # files. Exposed through the list_skills and activate_skill tools.
-skills_dir: "skills"
+skills_dir: "/skills"
 
 # Predefined environments mapping client-facing names to Agent Substrate templates.
 environments:
