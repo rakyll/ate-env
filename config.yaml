@@ -3,6 +3,11 @@
 # Address/port for the HTTP environment service to listen on
 listen: ":7777"
 
+# Directory holding agentic skills. Each skill is a subdirectory containing a
+# SKILL.md file (YAML frontmatter + markdown instructions) plus any bundled
+# files. Exposed through the list_skills and activate_skill tools.
+skills_dir: "skills"
+
 # Predefined environments mapping client-facing names to Agent Substrate templates.
 environments:
   - name: "bash-env"
@@ -12,6 +17,8 @@ environments:
       - "read_file"
       - "write_file"
       - "list_dir"
+      - "list_skills"
+      - "activate_skill"
 
 ate:
   # Address of the Agent Substrate ateapi gRPC server

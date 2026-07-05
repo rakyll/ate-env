@@ -34,6 +34,9 @@ Configuration is loaded from `config.yaml` in the working directory. If the file
 # Address/port for this HTTP service to listen on
 listen: ":7777"
 
+# Directory holding agentic skills, exposed via list_skills/activate_skill.
+skills_dir: "skills"
+
 # Agent Substrate configuration.
 ate:
   ateapi: "ateapi.ate-system.svc.cluster.local:443"
@@ -48,14 +51,17 @@ environments:
       - "read_file"
       - "write_file"
       - "list_dir"
+      - "list_skills"
+      - "activate_skill"
 ```
 
 | Field           | Default            | Description                                             |
 | --------------- | ------------------ | ------------------------------------------------------- |
 | `listen`        | `:7777`            | Bind address.|
+| `skills_dir`    | `skills`           | Directory holding agentic skills (see below).           |
+| `environments`  | `bash-env` -> `bash-env-template` | List of predefined client-facing environment to Agent Substrate template mappings. |
 | `ate.ateapi`    | `ateapi.ate-system.svc.cluster.local:443` | Agent Substrate Control API endpoint.|
 | `ate.atespace`  | `default`          | Actor template atespace.                                |
-| `environments`  | `bash-env` -> `bash-env-template` | List of predefined client-facing environment to Agent Substrate template mappings. |
 
 
 ## Usage
@@ -119,6 +125,21 @@ All tool calls run in-process in this binary. The `bash` tool executes the comma
 | `read_file`   | `path` | Reads and returns the file contents (`os.ReadFile`). |
 | `write_file`  | `path`, `content` | Creates parent dirs (`os.MkdirAll`) and writes the content (`os.WriteFile`). |
 | `list_dir`    | `path` | Lists the directory (`os.ReadDir`), `ls -la` style. |
+| `list_skills` | — | Lists the available agentic skills with their descriptions. |
+| `activate_skill` | `name` | Returns the skill's full SKILL.md instructions and its bundled files. |
+
+## Agentic skills
+
+The service supports [Agent Skills](https://agentskills.io) out of the box. A skill is a subdirectory of `skills_dir` containing a `SKILL.md` file — YAML frontmatter (`name`, `description`) followed by markdown instructions — plus any bundled files the instructions reference:
+
+```
+skills/
+└── pdf-processing/
+    ├── SKILL.md
+    └── extract.sh
+```
+
+Skills follow progressive disclosure: `list_skills` returns only each skill's name and description so the agent can pick one cheaply, and `activate_skill` loads the chosen skill's full instructions along with the paths of its bundled files, which the agent can then `read_file` or execute with `bash`. Both tools must be listed in an environment's `allowed_tools` to be callable.
 
 ## Example: end-to-end with curl
 

@@ -36,14 +36,17 @@ import (
 type SessionManager struct {
 	ateapiAddr   string
 	atespace     string
+	skillsDir    string
 	environments map[string]EnvDetails
 }
 
-// NewSessionManager creates a new SessionManager.
-func NewSessionManager(ateapiAddr, atespace string, environments map[string]EnvDetails) *SessionManager {
+// NewSessionManager creates a new SessionManager. skillsDir is the directory
+// holding agentic skills (see skills.go); it may be empty to disable skills.
+func NewSessionManager(ateapiAddr, atespace, skillsDir string, environments map[string]EnvDetails) *SessionManager {
 	return &SessionManager{
 		ateapiAddr:   ateapiAddr,
 		atespace:     atespace,
+		skillsDir:    skillsDir,
 		environments: environments,
 	}
 }
@@ -238,6 +241,29 @@ func (s *SessionManager) executeToolCall(ctx context.Context, envVariables []Env
 			path = "."
 		}
 		out, err := listDir(path)
+		if err != nil {
+			resp.Output = fmt.Sprintf("Error: %v", err)
+			return resp
+		}
+		resp.Output = out
+		return resp
+
+	case "list_skills":
+		out, err := listSkills(s.skillsDir)
+		if err != nil {
+			resp.Output = fmt.Sprintf("Error: %v", err)
+			return resp
+		}
+		resp.Output = out
+		return resp
+
+	case "activate_skill":
+		name, _ := args["name"].(string)
+		if name == "" {
+			resp.Output = "Error: 'name' argument is required"
+			return resp
+		}
+		out, err := activateSkill(s.skillsDir, name)
 		if err != nil {
 			resp.Output = fmt.Sprintf("Error: %v", err)
 			return resp

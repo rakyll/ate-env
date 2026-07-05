@@ -18,16 +18,17 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/rakyll/ate-env/internal/config"
 )
 
 func TestSessionManager_Execute(t *testing.T) {
-	store := NewSessionManager("localhost:8080", "default", map[string]EnvDetails{
+	store := NewSessionManager("localhost:8080", "default", writeTestSkills(t), map[string]EnvDetails{
 		"bash-env": {
 			TemplateName: "bash-env-template",
-			Tools:        []string{"bash", "read_file", "write_file"},
+			Tools:        []string{"bash", "read_file", "write_file", "list_skills", "activate_skill"},
 		},
 	})
 	sessionID := "test-session-123"
@@ -150,6 +151,98 @@ func TestSessionManager_Execute(t *testing.T) {
 			t.Errorf("Expected response content '%s', got '%s'", expectedErr, resp.Output)
 		}
 	})
+
+	// 5. Test "list_skills" tool call surfaces skill metadata.
+	t.Run("list_skills tool", func(t *testing.T) {
+		input := ToolCall{
+			ID:   "call-5",
+			Type: "function",
+			Function: FunctionCall{
+				Name: "list_skills",
+			},
+		}
+
+		resp, err := store.Execute(context.Background(), sessionID, "bash-env", nil, input)
+		if err != nil {
+			t.Fatalf("Execute failed: %v", err)
+		}
+
+		if !strings.Contains(resp.Output, "pdf-processing: Extract text from PDF files.") {
+			t.Errorf("Expected listing to include pdf-processing skill, got %q", resp.Output)
+		}
+	})
+
+	// 6. Test "activate_skill" tool call returns the skill instructions and
+	// bundled files.
+	t.Run("activate_skill tool", func(t *testing.T) {
+		input := ToolCall{
+			ID:   "call-6",
+			Type: "function",
+			Function: FunctionCall{
+				Name:      "activate_skill",
+				Arguments: `{"name": "pdf-processing"}`,
+			},
+		}
+
+		resp, err := store.Execute(context.Background(), sessionID, "bash-env", nil, input)
+		if err != nil {
+			t.Fatalf("Execute failed: %v", err)
+		}
+
+		if !strings.Contains(resp.Output, "Run extract.sh against the PDF.") {
+			t.Errorf("Expected skill instructions in output, got %q", resp.Output)
+		}
+		if !strings.Contains(resp.Output, filepath.Join("pdf-processing", "extract.sh")) {
+			t.Errorf("Expected bundled file listing in output, got %q", resp.Output)
+		}
+	})
+
+	// 7. Test "activate_skill" with an unknown skill returns an error response.
+	t.Run("activate_skill unknown skill", func(t *testing.T) {
+		input := ToolCall{
+			ID:   "call-7",
+			Type: "function",
+			Function: FunctionCall{
+				Name:      "activate_skill",
+				Arguments: `{"name": "no-such-skill"}`,
+			},
+		}
+
+		resp, err := store.Execute(context.Background(), sessionID, "bash-env", nil, input)
+		if err != nil {
+			t.Fatalf("Execute failed: %v", err)
+		}
+
+		if !strings.Contains(resp.Output, `skill "no-such-skill" not found`) {
+			t.Errorf("Expected not-found error output, got %q", resp.Output)
+		}
+	})
+}
+
+// writeTestSkills lays out a skills directory with one skill in the Agent
+// Skills format: a directory holding SKILL.md plus a bundled script.
+func writeTestSkills(t *testing.T) string {
+	t.Helper()
+
+	skillsDir := t.TempDir()
+	skillDir := filepath.Join(skillsDir, "pdf-processing")
+	if err := os.MkdirAll(skillDir, 0o755); err != nil {
+		t.Fatalf("failed to create skill dir: %v", err)
+	}
+	skillMD := `---
+name: pdf-processing
+description: Extract text from PDF files.
+---
+
+Run extract.sh against the PDF.
+`
+	if err := os.WriteFile(filepath.Join(skillDir, "SKILL.md"), []byte(skillMD), 0o644); err != nil {
+		t.Fatalf("failed to write SKILL.md: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(skillDir, "extract.sh"), []byte("#!/bin/sh\n"), 0o755); err != nil {
+		t.Fatalf("failed to write bundled script: %v", err)
+	}
+	return skillsDir
 }
 
 func TestLoadYAMLConfig(t *testing.T) {
