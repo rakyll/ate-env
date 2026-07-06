@@ -109,7 +109,7 @@ Suspend the session's actor.
 **Response:** `{ "status": "ok" }`
 
 
-### Tool Calls
+### Tool Call
 
 `POST /v1/environments/{env}/sessions/{session_id}`
 
