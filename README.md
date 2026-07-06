@@ -92,6 +92,14 @@ Environment variables the script honors:
 
 ## API
 
+Applications are responsible for session resumption and suspension. A typical application makes calls in the following fashion:
+
+1. Resume session
+2. Tool call
+3. Tool call
+4. Tool call
+5. Suspend session
+
 ### Resume
 
 `POST /v1/environments/{env}/sessions/{session_id}/resume`
