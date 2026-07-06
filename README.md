@@ -66,15 +66,7 @@ environments:
 
 ## Usage
 
-Run the service locally:
-
-```bash
-ate-env serve --config config.yaml
-```
-
-### Deploying to a cluster
-
-`./manifests/install.sh` builds the image with [podman](https://podman.io) or [docker](https://docker.com) using the multi-stage `Dockerfile` at the repo root, pushes it, and deploys the service to the `ate-env` namespace of your current kubectl context. The cluster must already have [Agent Substrate](https://github.com/agent-substrate/substrate) installed and reachable at the `ate.ateapi` endpoint configured in `config.yaml`.
+Your cluster must already have [Agent Substrate](https://github.com/agent-substrate/substrate) installed.
 
 ```bash
 # Build, push, and deploy. Set GOOGLE_PROJECT_ID to push to gcr.io/$GOOGLE_PROJECT_ID,
