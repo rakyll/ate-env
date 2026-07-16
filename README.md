@@ -21,7 +21,8 @@ flowchart LR
     runtime -->|resume, suspend, execute| env
     env -->|actor lifecycle operations| substrate
     env -->|tool call operations| actor
-    actor --> available_skills["Available Skills"] --> skill
+    substrate -.->  actor
+    actor --> available_skills["available skills"] --> skill
     actor --> filesystem
     actor --> bash
 ```
