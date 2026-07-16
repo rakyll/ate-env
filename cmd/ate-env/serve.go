@@ -100,9 +100,10 @@ func handleResume(sm *session.SessionManager) http.HandlerFunc {
 // handleSuspend handles session suspend requests.
 func handleSuspend(sm *session.SessionManager) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		envName := r.PathValue("env")
 		sessionID := r.PathValue("session_id")
 
-		if err := sm.Suspend(r.Context(), sessionID); err != nil {
+		if err := sm.Suspend(r.Context(), sessionID, envName); err != nil {
 			log.Printf("failed to suspend session %s: %v", sessionID, err)
 			http.Error(w, fmt.Sprintf("failed to suspend session: %v", err), http.StatusInternalServerError)
 			return

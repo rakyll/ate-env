@@ -12,6 +12,7 @@ skills_dir: "/skills"
 environments:
   - name: "bash-env"
     template: "bash-env-template"
+    atespace: "default"
     allowed_tools:
       - "bash"
       - "read_file"
@@ -23,6 +24,3 @@ environments:
 ate:
   # Address of the Agent Substrate ateapi gRPC server
   ateapi: "ateapi.ate-system.svc.cluster.local:443"
-
-  # Agent Substrate atespace to create/resume actors
-  atespace: "default"

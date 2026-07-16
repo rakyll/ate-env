@@ -35,17 +35,15 @@ import (
 // SessionManager handles communication with Agent Substrate.
 type SessionManager struct {
 	ateapiAddr   string
-	atespace     string
 	skillsDir    string
 	environments map[string]EnvDetails
 }
 
 // NewSessionManager creates a new SessionManager. skillsDir is the directory
 // holding agentic skills (see skills.go); it may be empty to disable skills.
-func NewSessionManager(ateapiAddr, atespace, skillsDir string, environments map[string]EnvDetails) *SessionManager {
+func NewSessionManager(ateapiAddr, skillsDir string, environments map[string]EnvDetails) *SessionManager {
 	return &SessionManager{
 		ateapiAddr:   ateapiAddr,
-		atespace:     atespace,
 		skillsDir:    skillsDir,
 		environments: environments,
 	}
@@ -77,22 +75,26 @@ func (s *SessionManager) Resume(ctx context.Context, sessionID, envName string) 
 	defer conn.Close()
 
 	templateName := envName
+	atespace := "default"
 	var tools []string
 	if mapped, exists := s.environments[envName]; exists {
 		templateName = mapped.TemplateName
+		if mapped.Atespace != "" {
+			atespace = mapped.Atespace
+		}
 		tools = mapped.Tools
-		log.Printf("Creating actor %s with template %s (mapped from %s) in atespace %s with tools %v...", sessionID, templateName, envName, s.atespace, tools)
+		log.Printf("Creating actor %s with template %s (mapped from %s) in atespace %s with tools %v...", sessionID, templateName, envName, atespace, tools)
 	} else {
-		log.Printf("Creating actor %s with template %s in atespace %s...", sessionID, templateName, s.atespace)
+		log.Printf("Creating actor %s with template %s in atespace %s...", sessionID, templateName, atespace)
 	}
 
 	// 1. Create Actor (idempotent, ignore AlreadyExists)
 	_, err = cli.CreateActor(ctx, &ateapipb.CreateActorRequest{
 		ActorRef: &ateapipb.ActorRef{
-			Atespace: s.atespace,
+			Atespace: atespace,
 			Name:     sessionID,
 		},
-		ActorTemplateNamespace: s.atespace,
+		ActorTemplateNamespace: atespace,
 		ActorTemplateName:      templateName,
 	})
 	if err != nil && status.Code(err) != codes.AlreadyExists {
@@ -103,7 +105,7 @@ func (s *SessionManager) Resume(ctx context.Context, sessionID, envName string) 
 	log.Printf("Resuming actor %s...", sessionID)
 	_, err = cli.ResumeActor(ctx, &ateapipb.ResumeActorRequest{
 		ActorRef: &ateapipb.ActorRef{
-			Atespace: s.atespace,
+			Atespace: atespace,
 			Name:     sessionID,
 		},
 	})
@@ -116,9 +118,16 @@ func (s *SessionManager) Resume(ctx context.Context, sessionID, envName string) 
 }
 
 // Suspend suspends the underlying sandboxed actor.
-func (s *SessionManager) Suspend(ctx context.Context, sessionID string) error {
+func (s *SessionManager) Suspend(ctx context.Context, sessionID, envName string) error {
 	if sessionID == "" {
 		return fmt.Errorf("session_id cannot be empty")
+	}
+
+	atespace := "default"
+	if envName != "" {
+		if mapped, exists := s.environments[envName]; exists && mapped.Atespace != "" {
+			atespace = mapped.Atespace
+		}
 	}
 
 	cli, conn, err := s.dialAteAPI()
@@ -130,7 +139,7 @@ func (s *SessionManager) Suspend(ctx context.Context, sessionID string) error {
 	log.Printf("Suspending actor %s...", sessionID)
 	_, err = cli.SuspendActor(ctx, &ateapipb.SuspendActorRequest{
 		ActorRef: &ateapipb.ActorRef{
-			Atespace: s.atespace,
+			Atespace: atespace,
 			Name:     sessionID,
 		},
 	})

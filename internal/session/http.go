@@ -23,6 +23,7 @@ type EnvVariable struct {
 // EnvDetails holds predefined environment details.
 type EnvDetails struct {
 	TemplateName string
+	Atespace     string
 	Tools        []string
 }
 

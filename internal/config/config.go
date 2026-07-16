@@ -22,14 +22,14 @@ import (
 
 // AteConfig represents the nested Agent Substrate configuration.
 type AteConfig struct {
-	Ateapi   string `yaml:"ateapi"`
-	Atespace string `yaml:"atespace"`
+	Ateapi string `yaml:"ateapi"`
 }
 
 // EnvironmentConfig represents a predefined environment mapping.
 type EnvironmentConfig struct {
 	Name         string   `yaml:"name"`
 	Template     string   `yaml:"template"`
+	Atespace     string   `yaml:"atespace"`
 	AllowedTools []string `yaml:"allowed_tools"`
 }
 
@@ -47,13 +47,13 @@ func Default() *Config {
 		Listen:    ":7777",
 		SkillsDir: "/skills",
 		Ate: AteConfig{
-			Ateapi:   "ateapi.ate-system.svc.cluster.local:443",
-			Atespace: "default",
+			Ateapi: "ateapi.ate-system.svc.cluster.local:443",
 		},
 		Environments: []EnvironmentConfig{
 			{
 				Name:         "bash-env",
 				Template:     "bash-env-template",
+				Atespace:     "default",
 				AllowedTools: []string{"bash", "read_file", "write_file", "list_dir", "list_skills", "activate_skill"},
 			},
 		},
@@ -86,10 +86,12 @@ func Load(path string) (*Config, error) {
 	if parsed.Ate.Ateapi != "" {
 		cfg.Ate.Ateapi = parsed.Ate.Ateapi
 	}
-	if parsed.Ate.Atespace != "" {
-		cfg.Ate.Atespace = parsed.Ate.Atespace
-	}
 	if len(parsed.Environments) > 0 {
+		for i := range parsed.Environments {
+			if parsed.Environments[i].Atespace == "" {
+				parsed.Environments[i].Atespace = "default"
+			}
+		}
 		cfg.Environments = parsed.Environments
 	}
 

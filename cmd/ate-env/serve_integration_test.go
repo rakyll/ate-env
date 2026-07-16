@@ -103,16 +103,16 @@ func startService(t *testing.T, env testEnv) *httptest.Server {
 listen: ":0"
 ate:
   ateapi: %q
-  atespace: %q
 environments:
   - name: "bash-env"
     template: %q
+    atespace: %q
     allowed_tools:
       - "bash"
       - "read_file"
       - "write_file"
       - "list_dir"
-`, env.ateapiAddr, env.atespace, env.template)
+`, env.ateapiAddr, env.template, env.atespace)
 	if err := os.WriteFile(configPath, []byte(configYAML), 0o644); err != nil {
 		t.Fatalf("failed to write config: %v", err)
 	}
