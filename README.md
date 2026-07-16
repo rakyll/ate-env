@@ -148,8 +148,8 @@ All tool calls run in-process in this binary. The `bash` tool executes the comma
 | Tool          | Arguments                    | Behavior                                            |
 | ------------- | ---------------------------- | --------------------------------------------------- |
 | `bash`        | `command` | Runs the command locally with `sh -c` (`os/exec`); per-call env vars are merged in. |
-| `read_file`   | `path` | Reads and returns the file contents (`os.ReadFile`). |
-| `write_file`  | `path`, `content` | Creates parent dirs (`os.MkdirAll`) and writes the content (`os.WriteFile`). |
+| `read_file`   | `path` | Reads and returns the file contents (`os.ReadFile`). Only text files are supported. |
+| `write_file`  | `path`, `content` | Creates parent dirs (`os.MkdirAll`) and writes the content (`os.WriteFile`). Only text files are supported. |
 | `list_dir`    | `path` | Lists the directory (`os.ReadDir`), `ls -la` style. |
 | `list_skills` | — | Lists the available agentic skills with their descriptions. |
 | `activate_skill` | `name` | Returns the skill's full SKILL.md instructions and its bundled files. |

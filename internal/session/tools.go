@@ -25,7 +25,7 @@ import (
 // standard library, rather than shelling out. Only the bash tool is forwarded
 // to the actor's process runner.
 
-// readFile returns the contents of the file at path.
+// readFile returns the contents of the file at path. It only supports text files.
 func readFile(path string) (string, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -34,7 +34,7 @@ func readFile(path string) (string, error) {
 	return string(data), nil
 }
 
-// writeFile creates any missing parent directories and writes content to path.
+// writeFile creates any missing parent directories and writes content to path. It only supports text files.
 func writeFile(path, content string) (string, error) {
 	if dir := filepath.Dir(path); dir != "" {
 		if err := os.MkdirAll(dir, 0o755); err != nil {
