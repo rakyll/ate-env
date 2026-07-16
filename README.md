@@ -44,7 +44,7 @@ ate:
 
 # Predefined environments mapping client-facing names to Agent Substrate templates.
 environments:
-  - name: "default-env"
+  - name: "my-env"
     template: "default-env-template"
     atespace: "default"
     allowed_tools:
